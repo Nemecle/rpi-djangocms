@@ -1,0 +1,46 @@
+# Django Cms Dockerfile
+FROM hypriot/rpi-python 
+MAINTAINER Rafał bluszcz Zawadzki <bluszcz@bluszcz.net>
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install python-pip \
+	python-dev \
+	build-essential \
+	wget -y \
+	sqlite3 \
+	libffi-dev \
+	libssl-dev \
+	libtiff5-dev \
+	libjpeg8-dev \
+	zlib1g-dev \
+	libfreetype6-dev \
+	liblcms2-dev \
+	libwebp-dev \
+	python-tk 
+RUN apt-get install python-pip 
+# RUN apt-get build-dep pillow -y
+RUN pip install --upgrade pip
+RUN pip install wheel
+RUN pip install requests[security]
+RUN pip install virtualenv pillow django
+RUN useradd djangocms
+RUN mkdir /home/djangocms -p
+RUN chown djangocms /home/djangocms
+# RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8
+USER djangocms
+RUN cd /home/djangocms
+RUN id
+RUN virtualenv /home/djangocms/djangocms
+RUN /home/djangocms/djangocms/bin/pip install djangocms-installer
+RUN cd /home/djangocms/djangocms
+RUN /home/djangocms/djangocms/bin/djangocms -p . --starting-page yes -d sqlite://file///home/djangocms/djangocms/djangocms.db  -q  djangocms_demo
+RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'djangocms')" | /home/djangocms/djangocms/bin/python /home/djangocms/djangocms/manage.py shell
+USER root
+RUN apt-get clean
+RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
+EXPOSE 8000
+CMD sudo -u djangocms /home/djangocms/djangocms/bin/python /home/djangocms/djangocms/manage.py runserver 0:8000

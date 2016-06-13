@@ -1,0 +1,46 @@
+# Django Cms Dockerfile
+FROM hypriot/rpi-python 
+MAINTAINER nemecle <contact@nemecl.eu>
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install python-pip \
+	python-dev \
+	build-essential \
+	wget -y \
+	sqlite3 \
+	libffi-dev \
+	libssl-dev \
+	libtiff5-dev \
+	libjpeg8-dev \
+	zlib1g-dev \
+	libfreetype6-dev \
+	liblcms2-dev \
+	libwebp-dev \
+	python-tk \
+	libjpeg-dev \
+	libpng-dev
+RUN pip install --upgrade pip
+RUN pip install virtualenv
+#  \
+# 	wheel \
+# 	requests[security] \
+# 	pillow \
+# 	djangocms-installer
+RUN useradd djangocms
+RUN mkdir /home/djangocms -p
+RUN chown -hvR djangocms /home/djangocms
+# USER djangocms
+RUN mkdir /home/djangocms/website && cd /home/djangocms/website
+RUN virtualenv /home/djangocms/website/venv
+RUN mkdir /home/djangocms/website/app && cd /home/djangocms/website/app
+RUN /home/djangocms/website/venv/bin/pip install wheel \
+	requests[security] \
+	pillow \
+	djangocms-installer
+RUN  /home/djangocms/website/venv/bin/djangocms -p /home/djangocms/website/app --starting-page yes -d sqlite://file///home/djangocms/djangocms/djangocms.db  -q  blog 
+RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'djangocms')" | /home/djangocms/website/venv/bin/python /home/djangocms/website/app/manage.py shell
+# USER root
+RUN apt-get clean
+RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
+EXPOSE 8000
+CMD sudo -u djangocms /home/djangocms/website/venv/bin/python /home/djangocms/website/app/manage.py runserver
