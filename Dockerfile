@@ -1,6 +1,6 @@
 # djangoCMS Dockerfile for Raspberry Pi
 FROM hypriot/rpi-python 
-MAINTAINER nemecle <contact@nemecl.eu>
+MAINTAINER nemecle <nemecle@protonmail.com>
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install python-pip \
