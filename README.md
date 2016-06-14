@@ -18,6 +18,8 @@ run **"docker run -P -d rpi-djangocms"** (-P = attribute a random port to expose
 ### Production
 * Just connect your front server to the attributed port (run **docker ps -a** to see)
 * Use *docker exec -it <id of the container> -bash** and once in **/home/djangocms/website/app/manage.py shell** to access server console
+
+
 ## To do
 * Use a virtualenv: last tries failed as djangocms seemed to be calling system-wise python instead of venv one.
 * Put the djangocms user back for better tracking. Currently fails as well
