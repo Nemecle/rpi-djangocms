@@ -47,7 +47,8 @@ RUN djangocms -f -q -p /home/djangocms/website/app blog \
         --bootstrap yes \
         --templates no \
         --starting-page yes
-# RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'djangocms')" | python /home/djangocms/website/app/manage.py shell
+RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'djangocms')" > admin_add.py
+RUN echo python /home/djangocms/website/app/manage.py shell < admin_add.py
 # USER root
 EXPOSE 8000
 CMD python /home/djangocms/website/app/manage.py runserver 0:8000 
